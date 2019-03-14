@@ -155,10 +155,16 @@ def webhook_response(data, *, registration: Dict, status: int = 200,
 async def get_config_entry(hass: HomeAssistantType,
                            webhook_id: str) -> ConfigEntry:
     """Return the config entry for the given webhook ID."""
+    device = await get_device(hass, webhook_id)
+
+    return hass.config_entries.async_get_entry(list(device.config_entries)[0])
+
+
+async def get_device(hass: HomeAssistantType,
+                     webhook_id: str) -> dr.DeviceEntry:
+    """Return the config entry for the given webhook ID."""
     device_registry = await dr.async_get_registry(hass)
 
     identifiers = {(CONF_WEBHOOK_ID, webhook_id)}
 
-    device = device_registry.async_get_device(identifiers, set())
-
-    return hass.config_entries.async_get_entry(list(device.config_entries)[0])
+    return device_registry.async_get_device(identifiers, set())

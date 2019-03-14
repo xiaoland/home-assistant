@@ -1,5 +1,4 @@
 """Integrates Native Apps to Home Assistant."""
-from homeassistant.helpers.discovery import async_load_platform
 from homeassistant import config_entries
 from homeassistant.helpers.typing import ConfigType, HomeAssistantType
 
@@ -31,14 +30,6 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
 
     hass.data[DOMAIN][DATA_STORE] = store
 
-    if app_config[DATA_SENSOR]:
-        hass.async_create_task(async_load_platform(hass, DATA_SENSOR, DOMAIN,
-                                                   None, config))
-
-    if app_config[DATA_BINARY_SENSOR]:
-        hass.async_create_task(async_load_platform(hass, DATA_BINARY_SENSOR,
-                                                   DOMAIN, None, config))
-
     hass.http.register_view(RegistrationsView())
     register_websocket_handlers(hass)
     register_deleted_webhooks(hass)
@@ -48,6 +39,12 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
 
 async def async_setup_entry(hass, entry):
     """Set up a mobile_app entry."""
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(entry,
+                                                      DATA_BINARY_SENSOR))
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(entry, DATA_SENSOR))
+
     return await setup_registration(hass, entry.data, entry)
 
 

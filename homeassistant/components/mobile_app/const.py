@@ -98,7 +98,7 @@ UPDATE_REGISTRATION_SCHEMA = vol.Schema({
 
 WEBHOOK_PAYLOAD_SCHEMA = vol.Schema({
     vol.Required(ATTR_WEBHOOK_TYPE): cv.string,  # vol.In(WEBHOOK_TYPES)
-    vol.Required(ATTR_WEBHOOK_DATA, default={}): dict,
+    vol.Required(ATTR_WEBHOOK_DATA, default={}): vol.Any(dict, list),
     vol.Optional(ATTR_WEBHOOK_ENCRYPTED, default=False): cv.boolean,
     vol.Optional(ATTR_WEBHOOK_ENCRYPTED_DATA): cv.string,
 })
