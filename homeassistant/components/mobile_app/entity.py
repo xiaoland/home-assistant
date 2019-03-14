@@ -14,9 +14,8 @@ from .const import (ATTR_DEVICE_ID, ATTR_DEVICE_NAME, ATTR_MANUFACTURER,
                     ATTR_SENSOR_DEVICE_CLASS, ATTR_SENSOR_ICON,
                     ATTR_SENSOR_NAME, ATTR_SENSOR_STATE, ATTR_SENSOR_TYPE,
                     ATTR_SENSOR_TYPE_BINARY_SENSOR, ATTR_SENSOR_UNIQUE_ID,
-                    ATTR_SENSOR_UOM, DOMAIN, SIGNAL_SENSOR_UPDATE)
-
-from .helpers import get_device
+                    ATTR_SENSOR_UOM, DATA_CONFIG_ENTRIES, DATA_DEVICES, DOMAIN,
+                    SIGNAL_SENSOR_UPDATE)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,19 +37,21 @@ async def async_setup_mobile_app_platform(sensor_type, hass, config,
 
     if discovery_info is None:
         for sensor_config in sensor_configs.values():
-            device = await get_device(hass, sensor_config[CONF_WEBHOOK_ID])
+            webhook_id = sensor_config[CONF_WEBHOOK_ID]
 
-            config_id = list(device.config_entries)[0]
-            entry = hass.config_entries.async_get_entry(config_id)
+            device = hass.data[DOMAIN][DATA_DEVICES][webhook_id]
+
+            entry = hass.data[DOMAIN][DATA_CONFIG_ENTRIES][webhook_id]
 
             entities.append(platform(sensor_config, device, entry))
     else:
-        device = await get_device(hass, discovery_info[CONF_WEBHOOK_ID])
+        webhook_id = discovery_info[CONF_WEBHOOK_ID]
 
-        config_id = list(device.config_entries)[0]
-        entry = hass.config_entries.async_get_entry(config_id)
+        device = hass.data[DOMAIN][DATA_DEVICES][webhook_id]
 
-        key = "{}_{}".format(discovery_info[CONF_WEBHOOK_ID],
+        entry = hass.data[DOMAIN][DATA_CONFIG_ENTRIES][webhook_id]
+
+        key = "{}_{}".format(webhook_id,
                              discovery_info[ATTR_SENSOR_UNIQUE_ID])
         entities.append(platform(sensor_configs[key], device, entry))
 
@@ -72,7 +73,11 @@ async def async_setup_mobile_app_entry(sensor_type, hass, config_entry,
     entities = list()
 
     for sensor_config in sensor_configs.values():
-        device = await get_device(hass, sensor_config[CONF_WEBHOOK_ID])
+        webhook_id = sensor_config[CONF_WEBHOOK_ID]
+
+        device = hass.data[DOMAIN][DATA_DEVICES][webhook_id]
+
+        entry = hass.data[DOMAIN][DATA_CONFIG_ENTRIES][webhook_id]
 
         config_id = list(device.config_entries)[0]
         entry = hass.config_entries.async_get_entry(config_id)

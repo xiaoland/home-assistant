@@ -5,10 +5,7 @@ from typing import Callable, Dict, Tuple
 
 from aiohttp.web import json_response, Response
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import Context
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (ATTR_APP_DATA, ATTR_APP_ID, ATTR_APP_NAME,
@@ -150,21 +147,3 @@ def webhook_response(data, *, registration: Dict, status: int = 200,
 
     return Response(text=data, status=status, content_type='application/json',
                     headers=headers)
-
-
-async def get_config_entry(hass: HomeAssistantType,
-                           webhook_id: str) -> ConfigEntry:
-    """Return the config entry for the given webhook ID."""
-    device = await get_device(hass, webhook_id)
-
-    return hass.config_entries.async_get_entry(list(device.config_entries)[0])
-
-
-async def get_device(hass: HomeAssistantType,
-                     webhook_id: str) -> dr.DeviceEntry:
-    """Return the config entry for the given webhook ID."""
-    device_registry = await dr.async_get_registry(hass)
-
-    identifiers = {(CONF_WEBHOOK_ID, webhook_id)}
-
-    return device_registry.async_get_device(identifiers, set())
