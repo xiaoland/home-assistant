@@ -11,7 +11,7 @@ from .const import (ATTR_SENSOR_ATTRIBUTES,
                     ATTR_SENSOR_DEVICE_CLASS, ATTR_SENSOR_ICON,
                     ATTR_SENSOR_NAME, ATTR_SENSOR_STATE, ATTR_SENSOR_TYPE,
                     ATTR_SENSOR_TYPE_BINARY_SENSOR, ATTR_SENSOR_UNIQUE_ID,
-                    ATTR_SENSOR_UOM, DATA_REGISTRATIONS, DOMAIN,
+                    ATTR_SENSOR_UOM, DOMAIN,
                     SIGNAL_SENSOR_UPDATE)
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,7 +21,8 @@ async def async_setup_mobile_app_platform(sensor_type, hass, config,
                                           async_add_entities,
                                           discovery_info=None):
     """Set up the mobile app entity sensor."""
-    registrations = hass.data[DOMAIN][DATA_REGISTRATIONS]
+    # FIXME: not actually providing data
+    registrations = {}
     sensor_configs = hass.data[DOMAIN][sensor_type]
 
     platform_name = "MobileAppEntity"
@@ -120,9 +121,10 @@ class MobileAppEntity(Entity):
 
     async def async_update(self):
         """Get the latest state of the sensor."""
-        data = self.hass.data[DOMAIN]
-        self._device = data[DATA_REGISTRATIONS][self._device_id]
-        self._config = data[self._entity_type][self._sensor_id]
+        # FIXME: not actually providing data
+        # data = self.hass.data[DOMAIN]
+        # self._device = data[DATA_REGISTRATIONS][self._device_id]
+        # self._config = data[self._entity_type][self._sensor_id]
 
     @callback
     def _handle_update(self, data):
